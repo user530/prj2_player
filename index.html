@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+    #playlistWrapper{
+        display: flex;
+    }
+
+    #checkboxBlock{
+        display: flex;
+        flex-direction: column;
+        background-color: rgb(146, 31, 161);
+        width: 40px;
+    }
+
+    #controls{
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    #dropField{
+        width: fit-content;
+        height: fit-content;
+        width: 300px;
+        height: 300px;
+        background-color: rgb(146, 31, 161);
+        overflow: auto;
+    }
+
+    #player{
+        min-width: 300px;
+        min-height: 30px;
+    }
+
+    .ctrlBtn{
+        border: 1px solid black;
+        background-color: brown;
+    }
+
+    .btnPressed{
+        border: 2px solid black;
+        background-color: yellow;
+    }
+
+    #visual{
+        width: 1200px;
+        height: 500px;
+    }
+
+    .selected{
+        border: 2px solid red;    
+    }
+
+</style>
+
+<body>
+    <div id="wrapper">
+        
+        <div id="player">
+            <div id="visual"></div>
+            
+            <div id="controls">
+                <div class="btnRow1">
+                    <label for="AddSong">Add Songs</label>
+                    <input type="file" name="AddSong" id="btnAddSong" class="ctrlBtn" multiple>
+                    <button id="btnDelSong" class="ctrlBtn">DELETE</button>
+                    <button id="btnShuffle" class="ctrlBtn">SHUFFLE: OFF</button>
+                    <button id="btnLoop" class="ctrlBtn">LOOP PLAYLIST: OFF</button>
+                </div>
+                
+                <div class="btnRow2">
+                    <button id="btnPlay" class="ctrlBtn">PLAY TRACK</button>
+                    <button id="btnPause" class="ctrlBtn">PAUSE TRACK</button>
+                    <button id="btnStop" class="ctrlBtn">STOP TRACK</button>
+                    <button id="btnPrevious" class="ctrlBtn">PREVIOUS SONG</button>
+                    <button id="btnNext" class="ctrlBtn">NEXT SONG</button>
+                    <button id="btnRepeat" class="ctrlBtn">REPEAT MODE: OFF</button>
+                    <input type="range" name="volume" id="rangeVolume" min = "0" max = "1" step = '0.01' value = '1'>
+                    <label for="volume">VOLUME</label>
+                </div>
+
+                
+            </div>
+
+            <div id="playlistWrapper">
+                <div id="checkboxBlock"></div> 
+                <div id="dropField">Drag Files Here <br> or <br> Click for selection</div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="p5.min.js"></script>
+    <script src="p5.sound.js"></script>
+    <script src="controlsAndInput.js"></script>
+    <script src="playbackButton.js"></script>
+    <script src="visualisations.js"></script>
+    <script src="spectrum.js"></script>
+    <script src="wavepattern.js"></script>
+    <script src="needles.js"></script>
+    <script src="ridgePlots.js"></script>
+    <script src="test.js"></script>
+
+</body>
+</html>
