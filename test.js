@@ -218,7 +218,7 @@ function draw(){
     vis.selectedVisual.draw();
     
     //draw the controls on top.
-	controls.draw();
+    controls.draw();
 }
 
 function mouseClicked(){
@@ -387,3 +387,42 @@ function prevSong(playerObj){
         }  
     }  
 };
+
+function timeLine(){
+    if (curSong.isLoaded()){
+        let timeline = document.querySelector('#timeline');
+        let timetick;
+
+        
+        
+
+        updateTime(timetick);
+
+        timeline.addEventListener("change", ()=>{console.log('Click!')})
+    }    
+}
+
+//Function to update the timeline(input #timeline)
+function newTimeline(){
+    //Set new max equal to the duration
+    timeline.max = curSong.duration();
+    //Calculate and set new value of the timeline tick (time / input width)
+    timetick = timeline.max / 700;
+    timeline.step = timetick;
+
+    console.log(timeline.max + ' / ' + curSong.duration());
+    console.log(timetick);
+}
+
+
+    
+    
+
+function updateTime(interval){
+
+    setInterval(()=>{
+        if(curSong.currentTime() == curSong.duration()) console.log('KEK')
+        timeline.value = curSong.currentTime()}
+        , interval);
+        
+}
