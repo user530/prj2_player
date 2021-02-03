@@ -8,9 +8,17 @@ let player = {playlist: [],
 let curSong;
 let sampleSound = 'jump.wav';
 
+let timeline = new Timeline('timeline');
+
 let controls;
 let vis;
 let fourier;
+
+
+function preload(){
+    curSong = loadSound(sampleSound, ()=>{timeline.newTimeline(curSong)});
+    // curSong = loadSound('Sample.mp3', ()=>{timeline.newTimeline(curSong)});
+}
 
 function setup(){
     //-----------------------------------------------------
@@ -19,6 +27,7 @@ function setup(){
     a.parent(visualContainer);
     background(0);
     //-----------------------------------------------------
+
     controls = new ControlsAndInput();
 
     fourier = new p5.FFT();
@@ -28,11 +37,6 @@ function setup(){
     vis.add(new WavePattern());
     vis.add(new Needles());
     vis.add(new RidgePlots());
-}
-
-function preload(){
-    curSong = loadSound(sampleSound);
-    // curSong = loadSound('Sample.mp3');
 }
 
 window.onload = function(){
@@ -108,11 +112,13 @@ window.onload = function(){
             if(document.querySelector('.selected') != null){
                 if(curSong.file != document.querySelector('.selected').value){
                 curSong.stop();
-                curSong = loadSound(document.querySelector('.selected').value)
+                curSong = loadSound(document.querySelector('.selected').value,
+                    ()=>{timeline.newTimeline(curSong)})
                 }
             }else{
                 curSong.stop();
-                curSong = loadSound(sampleSound);
+                curSong = loadSound(sampleSound,
+                    ()=>{timeline.newTimeline(curSong)});
             }
 
             e.target.classList.remove('btnPressed');
@@ -141,6 +147,8 @@ window.onload = function(){
     document.querySelector('#btnPause').addEventListener('click', (e)=>{
         //Stop next callback event(next track playback)
         curSong.onended(()=>{});
+        //Stop timetracker
+        timeline.stopTimeline();
         //Pause current track
         curSong.pause();
     });
@@ -298,11 +306,14 @@ function newTrack(trackLine){
         //Switch active song
         if (curSong.isPlaying() || curSong.isPaused()){
             curSong.stop();
-            curSong = loadSound(trackLine.value, ()=>{playCycle()});
+            curSong = loadSound(trackLine.value, ()=>{
+                timeline.newTimeline(curSong);
+                playCycle()});
             
             //Keep player settings
             loadPlayerSettings(player);
-        }else curSong = loadSound(trackLine.value);
+        }else curSong = loadSound(trackLine.value,
+            ()=>{timeline.newTimeline(curSong)});
 
     }
 }
@@ -318,9 +329,19 @@ function loadPlayerSettings(playerObj){
 function playCycle(){
     //If break not reached -> play and shedule next song
     if(!player.cycleEnd){
+        //Start playing
         curSong.play();
-        curSong.onended(()=>{newTrack(nextSong(player))});
+        //Start updating timeline
+        timeline.updateTimeline();
+        //Update queque
+        curSong.onended(()=>{
+            newTrack(nextSong(player))});
     }
+}
+
+function stopCycle(){
+    curSong.stop();
+    timeline.stopTimeline();
 }
 
 function indexCurrent(playerObj){
@@ -387,42 +408,3 @@ function prevSong(playerObj){
         }  
     }  
 };
-
-function timeLine(){
-    if (curSong.isLoaded()){
-        let timeline = document.querySelector('#timeline');
-        let timetick;
-
-        
-        
-
-        updateTime(timetick);
-
-        timeline.addEventListener("change", ()=>{console.log('Click!')})
-    }    
-}
-
-//Function to update the timeline(input #timeline)
-function newTimeline(){
-    //Set new max equal to the duration
-    timeline.max = curSong.duration();
-    //Calculate and set new value of the timeline tick (time / input width)
-    timetick = timeline.max / 700;
-    timeline.step = timetick;
-
-    console.log(timeline.max + ' / ' + curSong.duration());
-    console.log(timetick);
-}
-
-
-    
-    
-
-function updateTime(interval){
-
-    setInterval(()=>{
-        if(curSong.currentTime() == curSong.duration()) console.log('KEK')
-        timeline.value = curSong.currentTime()}
-        , interval);
-        
-}
