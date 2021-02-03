@@ -46,13 +46,20 @@ function Timeline(lineID){
         if(reset){
             //Stop updating
             clearInterval(listener);
-            //Reset timestamp
+            //Reset timestamp and display
             line.value = 0;
+            
+            //Save the 'paused' time and set it to the display
+            this.curTime = line.value;
+            display.lastElementChild.innerHTML = `Time: ${this.curTime}
+                                                    / ${this.split(curSong.duration(), 'number', 2)}`;
+
         }else{
             //Stop updating
             clearInterval(listener);
         }
     }
+
 
     //Function to start/pause updating 
     this.updateTimeline = function(){
@@ -60,10 +67,26 @@ function Timeline(lineID){
         clearInterval(listener);
         //Set up new one
         listener = setInterval(()=>{
+            //Update the timeline pos
             line.value = curSong.currentTime();
-            this.curTime = line.value;
-        }, 
+            //Update the cur time value for the display
+            display.lastElementChild.innerHTML = `Time: ${this.split(curSong.currentTime(), 'number', 2)}
+                                                    / ${this.split(curSong.duration(), 'number', 2)}`;
+    }, 
         line.step);
     }
 
+    //Helper function to split the filename into name or format
+    this.split = function split(filename, nameOrFormat, numOfSymbAfterDot = 0){
+        if(nameOrFormat == 'name'){
+            return filename.slice(0, filename.lastIndexOf('.'));
+        }
+        else if(nameOrFormat == 'format'){
+            return filename.slice(filename.lastIndexOf('.')+1);
+        }
+        else if(nameOrFormat == 'number'){
+            return (filename + '').slice(0, (filename + '').lastIndexOf('.') + 1 + numOfSymbAfterDot);
+        }
+        
+    }
 }

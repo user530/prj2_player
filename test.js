@@ -7,6 +7,7 @@ let player = {playlist: [],
                 cycleEnd: false};
 let curSong;
 let sampleSound = 'jump.wav';
+let loadingState = false;
 
 let timeline = new Timeline('timeline');
 
@@ -14,10 +15,19 @@ let controls;
 let vis;
 let fourier;
 
+let dropZone;
+let display = document.querySelector('#display');
+let btns = document.getElementsByClassName('ctrlBtn');
 
 function preload(){
-    curSong = loadSound(sampleSound, ()=>{timeline.newTimeline(curSong)});
-    // curSong = loadSound('Sample.mp3', ()=>{timeline.newTimeline(curSong)});
+    curSong = loadSound(sampleSound, 
+        ()=>{songLoaded()}, 
+        ()=>{songError()}, 
+        (t)=>{songLoading(t)});
+    // curSong = loadSound('Sample.mp3', 
+        // ()=>{songLoaded()}, 
+        // ()=>{songError()}, 
+        // (t)=>{songLoading(t)});
 }
 
 function setup(){
@@ -37,12 +47,13 @@ function setup(){
     vis.add(new WavePattern());
     vis.add(new Needles());
     vis.add(new RidgePlots());
+
 }
 
 window.onload = function(){
     //---PLAYLIST---
-    let dropZone = document.querySelector('#dropField');
-
+    dropZone = document.querySelector('#dropField');
+    
     //AddSongBtn
     document.querySelector('#btnAddSong').addEventListener('change', (e)=>{
 
@@ -112,13 +123,17 @@ window.onload = function(){
             if(document.querySelector('.selected') != null){
                 if(curSong.file != document.querySelector('.selected').value){
                 stopCycle();
-                curSong = loadSound(document.querySelector('.selected').value,
-                    ()=>{timeline.newTimeline(curSong)})
+                curSong = loadSound(document.querySelector('.selected').value, 
+                            ()=>{songLoaded()}, 
+                            ()=>{songError()}, 
+                            (t)=>{songLoading(t)});
                 }
             }else{
                 stopCycle();
-                curSong = loadSound(sampleSound,
-                    ()=>{timeline.newTimeline(curSong)});
+                curSong = loadSound(sampleSound, 
+                    ()=>{songLoaded()}, 
+                    ()=>{songError()}, 
+                    (t)=>{songLoading(t)});
             }
 
             e.target.classList.remove('btnPressed');
@@ -274,7 +289,7 @@ function showPlaylist(playlistArr, playlistDiv){
         }
         //Else select the first track in playlist and load it
         else{
-            //Mark first element
+            //Mark the 1st element
             playNode[0].classList.add('selected');
             //Load the 1st track
             curSong.onended(()=>{});
@@ -306,14 +321,17 @@ function newTrack(trackLine){
         //Switch active song
         if (curSong.isPlaying() || curSong.isPaused()){
             stopCycle();
-            curSong = loadSound(trackLine.value, ()=>{
-                timeline.newTimeline(curSong);
-                playCycle()});
-            
+            curSong = loadSound(trackLine.value, 
+                ()=>{songLoaded();
+                    playCycle();}, 
+                ()=>{songError()}, 
+                (t)=>{songLoading(t)});
             //Keep player settings
             loadPlayerSettings(player);
-        }else curSong = loadSound(trackLine.value,
-            ()=>{timeline.newTimeline(curSong)});
+        }else curSong = loadSound(trackLine.value, 
+            ()=>{songLoaded()}, 
+            ()=>{songError()}, 
+            (t)=>{songLoading(t)});
 
     }
 }
@@ -408,3 +426,58 @@ function prevSong(playerObj){
         }  
     }  
 };
+
+//Callback while loading song
+function songLoading(){
+    //Display loading
+    display.firstElementChild.innerHTML = `LOADING...`;
+    display.lastElementChild.innerHTML = `Please wait`;
+
+    //Change loading state and 'disable' buttons
+    loadingState = true;
+    massClassChange(btns, 'add', 'btnOff');
+}
+
+//Callback on a successfull song load
+function songLoaded(startPlaying = false){
+    //Select the filename depending of the origin
+    let songName;
+    if(curSong.file != sampleSound){
+        songName = curSong.file.name
+    }else songName = curSong.file
+
+    //Display meta data
+    display.firstElementChild.innerHTML = `Song Name: ${timeline.split(songName,'name')}</br>
+                                            File Format: ${timeline.split(songName,'format')}`;
+    display.lastElementChild.innerHTML = `Time: 0 / ${timeline.split(curSong.duration(), 'number', 2)}`;
+
+    //Draw timeline for the new song
+    timeline.newTimeline(curSong)
+
+    //Change loading state and 'activate' buttons
+    loadingState = false;
+    massClassChange(btns, 'remove', 'btnOff');
+
+    
+}
+
+//Callback for the loading error
+function songError(){
+    alert('There has been an error processing your request! Please check ');
+}
+
+//Function for the mass class change
+function massClassChange(nodeArr, addOrRemove = 'add', className){
+    let arr = nodeArr;
+    let clName = className;
+    if(addOrRemove == 'add'){
+        for (let i = 0; i < arr.length; i++){
+            arr[i].classList.add(clName);
+        }
+    }
+    else if(addOrRemove == 'remove'){
+        for (let i = 0; i < arr.length; i++){
+            arr[i].classList.remove(clName);
+        }
+    }
+}
