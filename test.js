@@ -111,12 +111,12 @@ window.onload = function(){
             // Select next selected track or 'sample' if playlist empty
             if(document.querySelector('.selected') != null){
                 if(curSong.file != document.querySelector('.selected').value){
-                curSong.stop();
+                stopCycle();
                 curSong = loadSound(document.querySelector('.selected').value,
                     ()=>{timeline.newTimeline(curSong)})
                 }
             }else{
-                curSong.stop();
+                stopCycle();
                 curSong = loadSound(sampleSound,
                     ()=>{timeline.newTimeline(curSong)});
             }
@@ -148,7 +148,7 @@ window.onload = function(){
         //Stop next callback event(next track playback)
         curSong.onended(()=>{});
         //Stop timetracker
-        timeline.stopTimeline();
+        timeline.stopTimeline(false);
         //Pause current track
         curSong.pause();
     });
@@ -158,7 +158,7 @@ window.onload = function(){
         //Stop next callback event(next track playback)
         curSong.onended(()=>{});
         //Stop current track
-        curSong.stop();
+        stopCycle();
     });
     
     //Previous track button
@@ -278,7 +278,7 @@ function showPlaylist(playlistArr, playlistDiv){
             playNode[0].classList.add('selected');
             //Load the 1st track
             curSong.onended(()=>{});
-            curSong.stop();
+            stopCycle();
             newTrack(playNode[0]);
         }
     }
@@ -305,7 +305,7 @@ function newTrack(trackLine){
         
         //Switch active song
         if (curSong.isPlaying() || curSong.isPaused()){
-            curSong.stop();
+            stopCycle();
             curSong = loadSound(trackLine.value, ()=>{
                 timeline.newTimeline(curSong);
                 playCycle()});

@@ -2,6 +2,7 @@ function Timeline(lineID){
     let line = document.querySelector(`#${lineID}`);
     let timetick;
     let listener = null;
+    this.curTime = line.value;
 
     //Add clickable timeline
     line.addEventListener('click', (e)=>{
@@ -40,10 +41,17 @@ function Timeline(lineID){
     }
 
     //Function to pause
-    this.stopTimeline = function(){
+    this.stopTimeline = function(reset = true)
+    {
+        if(reset){
             //Stop updating
             clearInterval(listener);
-        
+            //Reset timestamp
+            line.value = 0;
+        }else{
+            //Stop updating
+            clearInterval(listener);
+        }
     }
 
     //Function to start/pause updating 
@@ -51,7 +59,10 @@ function Timeline(lineID){
         //Clear previous updater
         clearInterval(listener);
         //Set up new one
-        listener = setInterval(()=>{line.value = curSong.currentTime()}, 
+        listener = setInterval(()=>{
+            line.value = curSong.currentTime();
+            this.curTime = line.value;
+        }, 
         line.step);
     }
 
