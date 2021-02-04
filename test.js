@@ -1,4 +1,3 @@
-let playlist = [];
 let player = {playlist: [],
                 volume: 1,
                 repeatSong: false,
@@ -7,7 +6,7 @@ let player = {playlist: [],
                 cycleEnd: false};
 let curSong;
 let sampleSound = 'jump.wav';
-let loadingState = false;
+let bufferingState = false;
 
 let timeline = new Timeline('timeline');
 
@@ -21,13 +20,8 @@ let btns = document.getElementsByClassName('ctrlBtn');
 
 function preload(){
     curSong = loadSound(sampleSound, 
-        ()=>{songLoaded()}, 
-        ()=>{songError()}, 
-        (t)=>{songLoading(t)});
-    // curSong = loadSound('Sample.mp3', 
-        // ()=>{songLoaded()}, 
-        // ()=>{songError()}, 
-        // (t)=>{songLoading(t)});
+        ()=>{timeline.newTimeline(curSong)});
+        buffering();
 }
 
 function setup(){
@@ -99,7 +93,6 @@ window.onload = function(){
             //Show checkboxes 
             for(let i = 0; i < player.playlist.length; i++){
                 let checkBox = document.createElement('input');
-                
                 checkBox.type = 'checkbox';
                 // dropZone.appendChild(checkBox);
                 deleteZone.appendChild(checkBox);
@@ -124,16 +117,14 @@ window.onload = function(){
                 if(curSong.file != document.querySelector('.selected').value){
                 stopCycle();
                 curSong = loadSound(document.querySelector('.selected').value, 
-                            ()=>{songLoaded()}, 
-                            ()=>{songError()}, 
-                            (t)=>{songLoading(t)});
+                                    ()=>{timeline.newTimeline(curSong)});
+                buffering();
                 }
             }else{
                 stopCycle();
                 curSong = loadSound(sampleSound, 
-                    ()=>{songLoaded()}, 
-                    ()=>{songError()}, 
-                    (t)=>{songLoading(t)});
+                                    ()=>{timeline.newTimeline(curSong)});
+                buffering();
             }
 
             e.target.classList.remove('btnPressed');
@@ -150,41 +141,55 @@ window.onload = function(){
     //BUTTONS------------------------------------------------------------
     //Play button
     document.querySelector('#btnPlay').addEventListener('click', (e)=>{
-        //Reset the cycle break(If player auto-stop in the end -> allow to play the last song again)
-        player.cycleEnd = false;
-        //Launch autoplay
-        if (!curSong.isPlaying()){
-            playCycle();
+        //Works only if player is not in buffering state
+        if(!bufferingState){
+            //Reset the cycle break(If player auto-stop in the end -> allow to play the last song again)
+            player.cycleEnd = false;
+            //Launch autoplay
+            if (!curSong.isPlaying()){
+                playCycle();
+            }
         }
     });
 
     //Pause button
     document.querySelector('#btnPause').addEventListener('click', (e)=>{
-        //Stop next callback event(next track playback)
-        curSong.onended(()=>{});
-        //Stop timetracker
-        timeline.stopTimeline(false);
-        //Pause current track
-        curSong.pause();
+        //Works only if player is not in buffering state
+        if(!bufferingState){
+            //Stop next callback event(next track playback)
+            curSong.onended(()=>{});
+            //Stop timetracker
+            timeline.stopTimeline(false);
+            //Pause current track
+            curSong.pause();
+        }
     });
 
     //Stop button
     document.querySelector('#btnStop').addEventListener('click', (e)=>{
-        //Stop next callback event(next track playback)
-        curSong.onended(()=>{});
-        //Stop current track
-        stopCycle();
+        //Works only if player is not in buffering state
+        if(!bufferingState){
+            //Stop next callback event(next track playback)
+            curSong.onended(()=>{});
+            //Stop current track
+            stopCycle();
+        }
     });
     
     //Previous track button
     document.querySelector('#btnPrevious').addEventListener('click', (e)=>{
-        newTrack(prevSong(player));
+        //Works only if player is not in buffering state
+        if(!bufferingState){
+            newTrack(prevSong(player));
+        }
     });
 
     //Next track button
-
     document.querySelector('#btnNext').addEventListener('click', (e)=>{
-        newTrack(nextSong(player));
+        //Works only if player is not in buffering state
+        if(!bufferingState){
+            newTrack(nextSong(player));
+        }
     });
 
     //Repeat button
@@ -283,7 +288,7 @@ function showPlaylist(playlistArr, playlistDiv){
     
     //Select only if playlist is not empty
     if (playNode.length > 0){
-        //If playing track is in playlist select it  
+        //If currently playing track is in the playlist select it  
         if(playlistArr.indexOf(curSong.file) != -1){
             playNode[playlistArr.indexOf(curSong.file)].classList.add('selected');
         }
@@ -322,20 +327,19 @@ function newTrack(trackLine){
         if (curSong.isPlaying() || curSong.isPaused()){
             stopCycle();
             curSong = loadSound(trackLine.value, 
-                ()=>{songLoaded();
-                    playCycle();}, 
-                ()=>{songError()}, 
-                (t)=>{songLoading(t)});
+                                    ()=>{timeline.newTimeline(curSong);
+                    playCycle();});
+            buffering();
             //Keep player settings
             loadPlayerSettings(player);
         }else curSong = loadSound(trackLine.value, 
-            ()=>{songLoaded()}, 
-            ()=>{songError()}, 
-            (t)=>{songLoading(t)});
+                                    ()=>{timeline.newTimeline(curSong)});
+                buffering();
 
     }
 }
 
+//Function to load player settings for the current track
 function loadPlayerSettings(playerObj){
     //Keep loop
     if (playerObj.repeatSong) curSong.setLoop(playerObj.repeatSong);
@@ -344,6 +348,7 @@ function loadPlayerSettings(playerObj){
     curSong.setVolume(v); 
 }
 
+//Function to play the track (with autoplay) and update its timeline
 function playCycle(){
     //If break not reached -> play and shedule next song
     if(!player.cycleEnd){
@@ -357,21 +362,25 @@ function playCycle(){
     }
 }
 
+//Function to stop the track and reset its timeline
 function stopCycle(){
     curSong.stop();
     timeline.stopTimeline();
 }
 
+//Function to calculate the index of the current track selected in the playlist
 function indexCurrent(playerObj){
     let curTrack = document.querySelector('.selected')
     if(curTrack != null) return playerObj.playlist.indexOf(curTrack.value);
 }
 
+//Function to calculate the index of the random track in the playlist
 function indexRandom(playerObj){
     let playlistLength = playerObj.playlist.length;
     return Math.floor(Math.random()*playlistLength)
 }
 
+//Function to select next song file
 function nextSong(playerObj){
     let dropZone = document.querySelectorAll('#dropField div');
     let curInd = indexCurrent(playerObj);
@@ -379,13 +388,15 @@ function nextSong(playerObj){
     if (playerObj.playlist.length > 0){
         //Random song if shuffleON
         if(playerObj.shufflePlay){
-            let a = indexRandom(playerObj);
-            
-            while (a == curInd){
-            a = indexRandom(playerObj)
-            }
+            if(player.playlist.length != 1){
+                let a = indexRandom(playerObj);
+                
+                while (a == curInd){
+                    a = indexRandom(playerObj)
+                }
 
-            return dropZone[a];
+                return dropZone[a];
+            }else return dropZone[0];
         }
         else{
             //Return to 1st track when finished
@@ -400,6 +411,7 @@ function nextSong(playerObj){
     }  
 };
 
+//Function to select previous song file
 function prevSong(playerObj){
     let dropZone = document.querySelectorAll('#dropField div');
     let curInd = indexCurrent(playerObj)
@@ -427,45 +439,6 @@ function prevSong(playerObj){
     }  
 };
 
-//Callback while loading song
-function songLoading(){
-    //Display loading
-    display.firstElementChild.innerHTML = `LOADING...`;
-    display.lastElementChild.innerHTML = `Please wait`;
-
-    //Change loading state and 'disable' buttons
-    loadingState = true;
-    massClassChange(btns, 'add', 'btnOff');
-}
-
-//Callback on a successfull song load
-function songLoaded(startPlaying = false){
-    //Select the filename depending of the origin
-    let songName;
-    if(curSong.file != sampleSound){
-        songName = curSong.file.name
-    }else songName = curSong.file
-
-    //Display meta data
-    display.firstElementChild.innerHTML = `Song Name: ${timeline.split(songName,'name')}</br>
-                                            File Format: ${timeline.split(songName,'format')}`;
-    display.lastElementChild.innerHTML = `Time: 0 / ${timeline.split(curSong.duration(), 'number', 2)}`;
-
-    //Draw timeline for the new song
-    timeline.newTimeline(curSong)
-
-    //Change loading state and 'activate' buttons
-    loadingState = false;
-    massClassChange(btns, 'remove', 'btnOff');
-
-    
-}
-
-//Callback for the loading error
-function songError(){
-    alert('There has been an error processing your request! Please check ');
-}
-
 //Function for the mass class change
 function massClassChange(nodeArr, addOrRemove = 'add', className){
     let arr = nodeArr;
@@ -481,3 +454,51 @@ function massClassChange(nodeArr, addOrRemove = 'add', className){
         }
     }
 }
+
+//Function to display meta data on display
+function buffering(){
+    let data1 = display.firstElementChild;
+    let data2 = display.lastElementChild;
+
+    //Select the filename depending of the origin
+    let songName;
+    if(curSong.file != sampleSound){
+        songName = curSong.file.name
+    }else songName = curSong.file
+
+    //Change loading state and 'disable' buttons
+    bufferingState = true;
+    massClassChange(btns, 'add', 'btnOff');
+
+    //Display loading
+    data1.innerHTML = `LOADING`;
+    data2.innerHTML = `...`;
+
+    //Draw timeline for the new song
+    timeline.newTimeline(curSong)
+
+    //Custom callback to check loading
+    let bufferingCheck = setInterval(()=>{
+        // If buffering is complete
+        if(curSong.isLoaded()){
+            //Display meta data
+            data1.innerHTML = `Song Name: ${timeline.split(songName,'name')}</br>
+                                            File Format: ${timeline.split(songName,'format')}`;
+            data2.innerHTML = `Time: 0 / ${timeline.split(curSong.duration(), 'number', 2)}`;
+        
+            //Change loading state and 'activate' buttons
+            bufferingState = false;
+            massClassChange(btns, 'remove', 'btnOff');
+
+            //Self terminate
+            clearInterval(bufferingCheck);
+        }
+        // If still buffering
+        else{
+            //Show loading process dots
+            if(data2.innerHTML.length == 5) data2.innerHTML = '.'
+            else data2.innerHTML += '.'
+        }
+    }, 200);
+
+} 

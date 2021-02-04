@@ -6,29 +6,31 @@ function Timeline(lineID){
 
     //Add clickable timeline
     line.addEventListener('click', (e)=>{
-        //Slider X
-        let sl_x = line.getBoundingClientRect();
-        //Click X
-        let cl_x = e.clientX
-        //Calculate the length of the segment
-        let time_width = cl_x - sl_x.x;
-        //Calculate the time from the segment length and the tick value
-        let stamp = timetick * time_width;
+        if(!bufferingState){
+            //Slider X
+            let sl_x = line.getBoundingClientRect();
+            //Click X
+            let cl_x = e.clientX
+            //Calculate the length of the segment
+            let time_width = cl_x - sl_x.x;
+            //Calculate the time from the segment length and the tick value
+            let stamp = timetick * time_width;
 
-        //Stop updating
-        clearInterval(listener);
-        //Clear callback before stop and stop the song (for some reason jumping on active play caused some weird bugs)
-        curSong.onended(()=>{});
-        curSong.stop();
-        //Jump to the click timestamp
-        curSong.jump(stamp);
-        //Restore callback
-        curSong.onended(()=>{
-            newTrack(nextSong(player))});
-        //Update the input value
-        line.value = stamp;
-        //Restart updating timeline
-        this.updateTimeline();
+            //Stop updating
+            clearInterval(listener);
+            //Clear callback before stop and stop the song (for some reason jumping on active play caused some weird bugs)
+            curSong.onended(()=>{});
+            curSong.stop();
+            //Jump to the click timestamp
+            curSong.jump(stamp);
+            //Restore callback
+            curSong.onended(()=>{
+                newTrack(nextSong(player))});
+            //Update the input value
+            line.value = stamp;
+            //Restart updating timeline
+            this.updateTimeline();
+        }
     })
 
     //Function to update the timeline(input #timeline)
@@ -60,7 +62,6 @@ function Timeline(lineID){
         }
     }
 
-
     //Function to start/pause updating 
     this.updateTimeline = function(){
         //Clear previous updater
@@ -76,7 +77,7 @@ function Timeline(lineID){
         line.step);
     }
 
-    //Helper function to split the filename into name or format
+    //Helper function to split the filename
     this.split = function split(filename, nameOrFormat, numOfSymbAfterDot = 0){
         if(nameOrFormat == 'name'){
             return filename.slice(0, filename.lastIndexOf('.'));
