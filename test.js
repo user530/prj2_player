@@ -9,7 +9,7 @@ let sampleSound = 'jump.wav';
 let bufferingState = false;
 
 let timeline = new Timeline('timeline');
-
+let beatdetector = new BeatDetector();
 let controls;
 let vis;
 let fourier;
