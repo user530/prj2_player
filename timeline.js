@@ -38,7 +38,7 @@ function Timeline(lineID){
         //Set new max equal to the duration
         line.max = song.duration();
         //Calculate and set new value of the timeline tick (time / line width)
-        timetick = line.max / 700;
+        timetick = line.max / line.clientWidth;
         line.step = timetick;
     }
 

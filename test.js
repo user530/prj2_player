@@ -138,6 +138,30 @@ window.onload = function(){
 
     });
 
+    //Function to switch visibility of the element
+    function toggleVisibility(element){
+        let dispStyle = window.getComputedStyle(element).display;
+        if(dispStyle != 'none') element.style.display = 'none'
+        else element.style.display = 'block'
+    }
+
+    //ShowPlaylist Button
+    document.querySelector('#btnShowPlaylist').addEventListener('click', (e)=>{
+        e.stopPropagation();
+
+        toggleVisibility(document.querySelector('#playlistWrapper'));
+        
+    });
+
+    //ShowVisuals Button
+    document.querySelector('#btnShowVisuals').addEventListener('click', (e)=>{
+        e.stopPropagation();
+
+        toggleVisibility(document.querySelector('#visual'));
+        
+    });
+
+
     //BUTTONS------------------------------------------------------------
     //Play button
     document.querySelector('#btnPlay').addEventListener('click', (e)=>{
@@ -482,7 +506,7 @@ function buffering(){
         // If buffering is complete
         if(curSong.isLoaded()){
             //Display meta data
-            data1.innerHTML = `Song Name: ${timeline.split(songName,'name')}</br>
+            data1.innerHTML = `Current Song: ${timeline.split(songName,'name')}</br>
                                             File Format: ${timeline.split(songName,'format')}`;
             data2.innerHTML = `Time: 0 / ${timeline.split(curSong.duration(), 'number', 2)}`;
         
