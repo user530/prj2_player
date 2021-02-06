@@ -3,7 +3,7 @@ function Vis1(){
     let angle = 0;
     let r = 80;
     let stars = [];
-    let starCount = 60;
+    let starCount = 200;
 
     this.draw = function(){
         let spectrum = fourier.analyze();
@@ -23,10 +23,14 @@ function Vis1(){
             //Setup N random angles for the stars, add new when needed
             if (stars.length < starCount){
                 for(let i = stars.length; i < starCount; i++){
+                    //Initialize a star
                     let star = {};
+                    //Set random angle and speed
                     let randAng = Math.ceil(map(Math.random(), 0, 1, 0, 720)) * 360/720;
-                    let randSp = Math.ceil()
+                    let randSpd = Math.ceil(map(Math.random(), 0, 1, 1, 10));
+                    //Set attributes and save the star
                     star.ang = randAng;
+                    star.spd = randSpd;
                     stars.push(star);
                 }
             }
@@ -68,8 +72,8 @@ function Vis1(){
             //Draw the star
             point(stars[i].x, stars[i].y);
             //Move the star
-                stars[i].x = stars[i].x + 10 * cos(stars[i].ang);
-                stars[i].y = stars[i].y + 10 * sin(stars[i].ang);
+                stars[i].x = stars[i].x + stars[i].spd * cos(stars[i].ang);
+                stars[i].y = stars[i].y + stars[i].spd * sin(stars[i].ang);
             //Delete it when it leaves the screen
             if(stars[i].x < 0 || stars[i].x > width || stars[i].y < 0 || stars[i].y > height){
                 stars.splice(i,1);
