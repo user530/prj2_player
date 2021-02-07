@@ -43,7 +43,6 @@ function Vis2(){
 
             pop();
 
-            let spawnBalls = [];
             // Spawn the balls(from 1 to 5) on beat;
             if(beatThisFrame){
                 //Setup n of iterations
@@ -59,14 +58,65 @@ function Vis2(){
                     ball.speed = Math.ceil(map(Math.random(), 0, 1, 1, 10));
                     ball.color = [(i%2 == 0) * rightEnergy, (j%2 == 0) * rightEnergy, (ball.speed < 5) * rightEnergy];
 
-                    spawnBalls.push(ball);
-
-                    push();
-                    fill(ball.color);
-                    ellipse(ball.x1, ball.y1, ball.d);
-                    pop();
+                    balls.push(ball);
                 }
             }
         }
+
+        //Draw balls
+        for(let i = 0; i < balls.length; i++){
+            push();
+            fill(balls[i].color);
+            ellipse(balls[i].x1, balls[i].y1, balls[i].d);
+            pop();
+
+            //----------------------------------------------------------------------
+            //Update balls x coordinate
+            let vectX = balls[i].speed * cos(balls[i].ang)
+                //Check if ball moves to the right
+            if(cos(balls[i].ang) > 0){
+                //Move ball to the right but within bounds
+                balls[i].x1 += min(vectX, width - (balls[i].x1 + balls[i].d/2));
+            }
+               //Check if ball moves to the left
+            else{
+                //Move ball to the left but within bounds
+                balls[i].x1 += max(vectX, -balls[i].x1 + balls[i].d/2);
+            }
+
+            //Check if ball reached right/left -> reflect it
+            if (balls[i].x1 - balls[i].d/2 == 0 || balls[i].x1 + balls[i].d/2 == width){
+                balls[i].ang = 180 - balls[i].ang;
+            }
+
+            //Update balls y coordinate
+            let vectY = balls[i].speed * sin(balls[i].ang);
+                //Check if ball moves to the top
+            if(sin(balls[i].ang) < 0){
+                //Move ball to the top but within bounds
+                balls[i].y1 += max(vectY, -balls[i].y1 + balls[i].d/2);
+            }
+                //Check if ball moves to the bottom
+            else{
+                //Move ball to the bottom but within bounds
+                balls[i].y1 += min(vectY, height - (balls[i].y1 + balls[i].d/2));
+            }
+
+            //Check if ball reached top/down -> reflect it
+            if (balls[i].y1 - balls[i].d/2 == 0 || balls[i].y1 + balls[i].d/2 == height){
+                balls[i].ang = - balls[i].ang;
+            }
+
+            //Delete ball when it leaves the screen
+            if(balls[i].x1 + balls[i].d/2 < 0 || balls[i].x1 - balls[i].d/2 > width ||
+                balls[i].y1 + balls[i].d/2 < 0 || balls[i].y1 - balls[i].d/2 > height){
+                    balls.splice(i, 1);
+            }
+            //----------------------------------------------------------------------
+        }
+
+        
+        
+
     }
 }
