@@ -39,6 +39,7 @@ function Vis2(){
             //Stylize the nodes;
             push();
                 //Outer circle
+                stroke(0);
                 fill(255);
                 ellipse(x, y, D, D);
                 

@@ -1,17 +1,16 @@
-//constructor function to draw a
 function Needles() {
-	//name of the visualisation
+	//Name of the visualisation
 	this.name = "Needles";
 
-	//how large is the arc of the needle plot.
+	//How large is the arc of the needle plot.
 	var minAngle = PI + PI / 10;
 	var maxAngle = TWO_PI - PI / 10;
 
 	this.plotsAcross = 2;
 	this.plotsDown = 2;
 
-	//frquencies used by the energyfunction to retrieve a value
-	//for each plot.
+	/* Frequencies used by the energyfunction to retrieve a value
+	for each plot.*/
 	this.frequencyBins = ["bass", "lowMid", "highMid", "treble"];
 
 	//resize the plots sizes when the screen is resized.
@@ -38,22 +37,21 @@ function Needles() {
 		for (var i = 0; i < this.plotsDown; i++) {
 			for (var j = 0; j < this.plotsAcross; j++) {
 				//calculate the size of the plots
-				var x = this.pad/3 + (this.pad/3 + this.plotWidth) * j;
-				var y = this.pad/3 + (this.pad/3 + this.plotHeight) * i;
 				var w = this.plotWidth;
 				var h = this.plotHeight;
-
+				var x = this.pad/3 + (this.pad/3 + w) * j;
+				var y = this.pad/3 + (this.pad/3 + h) * i;
+				
 				//draw a rectangle at that location and size
 				rect(x, y, w, h);
 
 				//add on the ticks
-				this.ticks(x + this.plotWidth/2, y + this.plotHeight, this.frequencyBins[currentBin]);
+				this.ticks(x + w/2, y + h, this.frequencyBins[currentBin]);
 
 				var energy = fourier.getEnergy(this.frequencyBins[currentBin]);
 
 				//add the needle
-				this.needle(energy, x + this.plotWidth/2, y + this.plotHeight);
-
+				this.needle(energy, x + w/2, y + h);
 				currentBin++;
 			}
 		}
@@ -69,6 +67,7 @@ function Needles() {
 	 */
 	this.needle = function(energy, centreX, bottomY) {
 		push();
+		angleMode(RADIANS);
 		stroke('#333333');
 		//translate so 0 is at the bottom of the needle
 		translate(centreX, bottomY);

@@ -7,7 +7,7 @@ function ControlsAndInput(){
 
 	this.menuDisplayed = false;
 	
-	//playback button displayed in the top left of the screen
+	//Playback button displayed in the top left of the screen
 	// this.playbackButton = new PlaybackButton();						----------
 
 	//make the window fullscreen or revert to windowed

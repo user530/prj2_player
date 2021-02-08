@@ -14,7 +14,7 @@ function BeatDetector(){
         }
 
         if (sampleBuffer.length == 60){
-            //detecting a beat
+            //Detecting a beat
             let sampleSum = 0;
 
             for(let i = 0; i < sampleBuffer.length; i++){
@@ -23,7 +23,7 @@ function BeatDetector(){
 
             let sampleAvg = sampleSum/sampleBuffer.length;
 
-            //calculate margin
+            //Calculate the margin
             let varianceSum = 0;
             for (let i = 0; i < sampleBuffer; i++){
                 varianceSum += sampleBuffer[i] - sampleAvg;
@@ -35,12 +35,12 @@ function BeatDetector(){
             let b = 1 + (a * 200);
             let margin = varianceAvg * a + b; 
 
-            //check beat
+            //Check the beat
             if(sum > sampleAvg * margin){
                 beatOn = true;
             }
             
-            //shift sample
+            //Shift the sample
             sampleBuffer.splice(0,1);
             sampleBuffer.push(sum);
 

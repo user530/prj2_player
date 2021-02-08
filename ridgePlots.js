@@ -27,7 +27,7 @@ function RidgePlots(){
 
 
             //Add another line to Array
-                if(frameCount%45 == 0){
+                if(frameCount%25 == 0){
                     let line = [];
                     for (let i = 0; i < waveform.length; i++){
                         if (i % 20 == 0){
