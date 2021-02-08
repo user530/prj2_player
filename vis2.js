@@ -4,7 +4,6 @@ function Vis2(){
     this.name = 'TestVis2';
 
     let balls = [];
-    
 
     this.draw = function(){
         let spectrum = fourier.analyze();
@@ -16,10 +15,9 @@ function Vis2(){
         let beatThisFrame = beatdetector.detectBeat(spectrum);
 
         let bgColor = 0;
-        if(beatThisFrame)bgColor = 255;
-        
+
         background(bgColor);
-        stroke(255,0,0);
+        stroke(255);
 
         //Draw the energy nodes for the song
         for(let i = 0; i < 5; i++){
@@ -33,13 +31,13 @@ function Vis2(){
 
             //Stylize the nodes;
             push();
-
-            //Outer circle
-            fill(255,0,0);
-            ellipse(x, y, D, D);
-            //Inner circle
-            fill(bgColor);
-            ellipse(x, y, D*0.6, D*0.6);
+                //Outer circle
+                noFill();
+                ellipse(x, y, D, D);
+                
+                //Inner circle
+                fill(255);
+                ellipse(x, y, D*0.6, D*0.6);
 
             pop();
 
@@ -51,12 +49,12 @@ function Vis2(){
                     //Initialize and setup each ball
                     let ball = {};
 
-                    ball.d = max(20, D/4);
+                    ball.d = max(20, D/8);
                     ball.ang = randAng + j * 360/5;
                     ball.x1 = x + (D/2 + ball.d/2) * cos(ball.ang);
                     ball.y1 = y + (D/2 + ball.d/2) * sin(ball.ang);
                     ball.speed = Math.ceil(map(Math.random(), 0, 1, 1, 10));
-                    ball.color = [(i%2 == 0) * rightEnergy, (j%2 == 0) * rightEnergy, (ball.speed < 5) * rightEnergy];
+                    ball.color = [(i%2 == 0) * rightEnergy, (i%2 == 1) * rightEnergy, (j%2 == 0) * rightEnergy];
 
                     balls.push(ball);
                 }
@@ -66,6 +64,7 @@ function Vis2(){
         //Draw balls
         for(let i = 0; i < balls.length; i++){
             push();
+            stroke(255);
             fill(balls[i].color);
             ellipse(balls[i].x1, balls[i].y1, balls[i].d);
             pop();
@@ -107,12 +106,19 @@ function Vis2(){
                 balls[i].ang = - balls[i].ang;
             }
 
-            //Delete ball when it leaves the screen
-            if(balls[i].x1 + balls[i].d/2 < 0 || balls[i].x1 - balls[i].d/2 > width ||
-                balls[i].y1 + balls[i].d/2 < 0 || balls[i].y1 - balls[i].d/2 > height){
-                    balls.splice(i, 1);
-            }
+            // //Delete ball when it leaves the screen
+            // if(balls[i].x1 + balls[i].d/2 < 0 || balls[i].x1 - balls[i].d/2 > width ||
+            //     balls[i].y1 + balls[i].d/2 < 0 || balls[i].y1 - balls[i].d/2 > height){
+            //         balls.splice(i, 1);
+            // }
             //----------------------------------------------------------------------
+            for(let j = i + 1; j < balls.length; j++){
+                if(dist(balls[i].x1, balls[i].y1, 
+                    balls[j].x1, balls[j].y1) <= (balls[i].d + balls[j].d)/2){
+                        balls.splice(i, 1);
+                        balls.splice(j - 1, 1);
+                }
+            }
         }
 
         
