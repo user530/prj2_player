@@ -18,6 +18,8 @@ let dropZone;
 let display = document.querySelector('#display');
 let btns = document.getElementsByClassName('ctrlBtn');
 
+let bgColor = 0;
+
 function preload(){
     curSong = loadSound(sampleSound, 
         ()=>{timeline.newTimeline(curSong)});
@@ -29,7 +31,6 @@ function setup(){
     let visualContainer = document.querySelector('#visual');
     let a = createCanvas (1000, 500);
     a.parent(visualContainer);
-    background(0);
     //-----------------------------------------------------
 
     controls = new ControlsAndInput();
@@ -266,7 +267,7 @@ window.onload = function(){
 }
 
 function draw(){
-    background(0);
+    background(bgColor);
 
 	//draw the selected visualisation
     vis.selectedVisual.draw();
@@ -276,7 +277,8 @@ function draw(){
 }
 
 function mouseClicked(){
-	// controls.mousePressed();
+    controls.mousePressed();
+    clear();
 }
 
 function keyPressed(){

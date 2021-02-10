@@ -7,18 +7,17 @@ function ControlsAndInput(){
 
 	this.menuDisplayed = false;
 	
-	//Playback button displayed in the top left of the screen
-	// this.playbackButton = new PlaybackButton();						----------
+	//Fullscreen mode button displayed in the bottom right of the screen
+	this.fullscreenButton = new FullscreenButton();
 
 	//make the window fullscreen or revert to windowed
 	this.mousePressed = function(){
 
-		//check if the playback button has been clicked
-		//if not make the visualisation fullscreen
-		if(!this.playbackButton.hitCheck())
+		//check if the fullscreen mode button has been clicked
+		if(this.fullscreenButton.hitCheck())
 		{
-			let fs = fullscreen();
-			fullscreen(!fs);
+			this.fullscreenButton.resize()
+			
 		}
 		
 	};
@@ -47,8 +46,8 @@ function ControlsAndInput(){
 		strokeWeight(2);
 		textSize(34);
 
-		//playback button 
-		// this.playbackButton.draw();								------------
+		//Fullscreen button
+		this.fullscreenButton.draw();
 
 		//only draw the menu if menu displayed is set to true.
 		if(this.menuDisplayed){

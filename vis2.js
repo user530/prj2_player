@@ -21,7 +21,6 @@ function Vis2(){
         createNodes(bass, lowMid, mid, highMid, treble, beatThisFrame);
         
         drawBalls();
-
     }
 
     //Function to create nodes that spawn balls
@@ -116,6 +115,12 @@ function Vis2(){
             if (balls[i].y1 - balls[i].d/2 == 0 || balls[i].y1 + balls[i].d/2 == height){
                 balls[i].ang = - balls[i].ang;
             }
+
+            //Delete the balls that out of bound (when screen is resized)
+            if(balls[i].x1 - balls[i].d/2 > width || balls[i].x1 + balls[i].d/2 < 0 ||
+                balls[i].y1 - balls[i].d/2 > height || balls[i].y1 + balls[i].d/2 < 0){
+                    balls.splice(i, 1);
+                }
 
             // For each ball check the collision
             for(let j = i + 1; j < balls.length; j++){

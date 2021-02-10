@@ -18,15 +18,13 @@ function Needles() {
 		this.pad = width / 10;
 		this.plotWidth = (width - this.pad) / this.plotsAcross;
 		this.plotHeight = (height - this.pad) / this.plotsDown;
-		// this.dialRadius = (this.plotWidth - this.pad) / 2 - 5;
 		this.dialRadius = min(this.plotWidth/2,this.plotHeight) * 0.8;
 	};
 
-	//call onResize to set initial values when the object is created
-	this.onResize();
-
 	// draw the plots to the screen
 	this.draw = function() {
+		//call onResize to set initial values when the object is created
+		this.onResize();
 		//create an array amplitude values from the fft.
 		var spectrum = fourier.analyze();
 		//iterator for selecting frequency bin.
