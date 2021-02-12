@@ -13,7 +13,7 @@ function FullscreenButton(){
         iconW = 15;
         iconH = 15;
 
-        //Draw this 
+        //Draw this button
         push();
 
         stroke(255);
@@ -24,6 +24,7 @@ function FullscreenButton(){
         pop();
     }
 
+    //Check if button is clicked
     this.hitCheck = function(){
         if(mouseX >= iconX - iconW/2 && mouseX <= iconX + iconW/2 &&
             mouseY >= iconY - iconH/2 && mouseY <= iconY + iconH/2){
@@ -32,14 +33,11 @@ function FullscreenButton(){
         else return false;
     }
 
+    //Resize and move visual window
     this.resize = function(){     
-        // if(width != innerWidth && height != innerHeight){
-        //     resizeCanvas(innerWidth, innerHeight);
-        // }else resizeCanvas(initW, initH);
         let body = document.body;
         let visDiv = document.querySelector('#visual');
         
-
         if(body.style.margin != '0px'){
             body.style.margin = '0px';
             
@@ -47,7 +45,8 @@ function FullscreenButton(){
             visDiv.style.left = '0px';
             visDiv.style.top = '0px';
 
-            resizeCanvas(innerWidth, innerHeight)
+            resizeCanvas(innerWidth, innerHeight);
+            
         }
         else {
             body.style.margin = '8px';

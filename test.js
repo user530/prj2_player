@@ -44,6 +44,7 @@ function setup(){
     vis.add(new RidgePlots());
     vis.add(new Vis1());
     vis.add(new Vis2());
+    vis.add(new Vis3());
 
 }
 
@@ -278,7 +279,6 @@ function draw(){
 
 function mouseClicked(){
     controls.mousePressed();
-    clear();
 }
 
 function keyPressed(){
