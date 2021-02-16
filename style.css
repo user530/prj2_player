@@ -1,0 +1,46 @@
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.leftColumn,
+.rightColumn {
+  border: 5px solid red;
+  padding: 50px;
+}
+
+.leftColumn {
+  width: 75%;
+}
+
+.rightColumn {
+  width: 20%;
+}
+
+.playerRow1 {
+  display: flex;
+}
+
+.displayWrapper,
+.plBtns {
+  width: 50%;
+}
+
+.display {
+  width: auto;
+}
+
+.plBtns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.plBtns > * {
+  width: 49%;
+}

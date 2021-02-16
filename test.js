@@ -20,6 +20,7 @@ let btns = document.getElementsByClassName('ctrlBtn');
 
 let bgColor = 0;
 
+
 function preload(){
     curSong = loadSound(sampleSound, 
         ()=>{timeline.newTimeline(curSong)});
@@ -27,6 +28,9 @@ function preload(){
 }
 
 function setup(){
+    
+    frameRate(60);
+
     //-----------------------------------------------------
     let visualContainer = document.querySelector('#visual');
     let a = createCanvas (1000, 500);
