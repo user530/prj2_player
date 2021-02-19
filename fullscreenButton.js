@@ -8,13 +8,12 @@ function FullscreenButton(){
     let iconH;
     let fsState = false;
     let visDiv = document.querySelector('#visual');
-    // let wrap = visDiv.getBoundingClientRect();
     let wrap = document.querySelector('.visualWrapper');
 
     this.draw = function(){
         //Coordinates of the button
-        iconX = width - 20;
-        iconY = height - 20;
+        iconX = 20;
+        iconY = 20;
         iconW = 15;
         iconH = 15;
 

@@ -56,12 +56,12 @@ function ControlsAndInput(){
 
 		//Only draw the menu if menu displayed is set to true.
 		if(this.menuDisplayed){
-			text("Select a visualisation:", width * 0.1, height * 0.05);
+			text("Select a visualisation:", width * 0.05, height * 0.05);
 			this.menu(canWid);
 		}
 
 		//Show control button at the start
-		if (info == 1) text("Press the 'Space' button to open the visualisation menu", width * 0.1, height * 0.05);
+		if (info == 1) text("Press the 'Space' button to open the visualisation menu", width * 0.05, height * 0.05);
 		pop();
 
 	};

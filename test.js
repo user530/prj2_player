@@ -1,4 +1,6 @@
-// Main js file that handles player, playlist and visualisation
+// Main js file that handles all main components (player, playlist and visualisations)
+
+// Player object that keep all settings and playlist
 let player = {playlist: [],
                 volume: 1,
                 showPL: true,
@@ -6,7 +8,10 @@ let player = {playlist: [],
                 repeatSong: false,
                 loopPlaylist: false,
                 shufflePlay: false,
-                cycleEnd: false};
+                cycleEnd: false
+            };
+
+// Initialize variable for the current song
 let curSong;
 
 // Sample sound for testing
@@ -26,10 +31,9 @@ let controls;
 let vis;
 let fourier;
 let dropZone;
+let bgColor = 0;
 let display = document.querySelector('#display');
 let btns = document.getElementsByClassName('ctrlBtn');
-
-let bgColor = 0;
 
 // Load song
 function preload(){
@@ -41,6 +45,7 @@ function preload(){
 // Load all components and setup canvas
 function setup(){
     
+    // Setup default framerate
     frameRate(60);
 
     //Setup canvas
@@ -67,15 +72,6 @@ function setup(){
 
 }
 
-// // Change canvas size on resize
-// window.addEventListener('resize', ()=>{
-//     let visDiv = document.querySelector('#visual');
-//     let wrap = visDiv.getBoundingClientRect();
-//     resizeCanvas(wrap.width, wrap.height);
-//     // canvas.style.width = '100%';
-//     // canvas.style.height = '100%';
-// })
-
 // Initialize only when page fully loaded
 window.onload = function(){
     
@@ -94,16 +90,22 @@ window.onload = function(){
         e.target.value = '';
     });
     
-    //Custom drag'N'drop field
-        //Copy dragged files
+    // Custom drag'N'drop field
+    // 1)Copy dragged files
     dropZone.addEventListener('dragover', (e) => {
+
+        // Prevent default behaviour and propagation to the child elements 
         e.stopPropagation();
         e.preventDefault();
 
         e.dataTransfer.dropEffect = 'copy';
+
     });
-        //Load copied songs 
+
+    // 2)Load copied songs 
     dropZone.addEventListener('drop', (e) => {
+
+        // Prevent default behaviour and propagation to the child elements
         e.stopPropagation();
         e.preventDefault();
 
@@ -115,8 +117,10 @@ window.onload = function(){
 
     });
     
-    //DelSongBtn
+    //Button to activate deletion process
     document.querySelector('#btnDelSong').addEventListener('click', (e)=>{
+
+        // Prevent default behaviour
         e.stopPropagation();
         
         //First click sets value
@@ -125,6 +129,7 @@ window.onload = function(){
         //The first click activate "Edit mode", the second click confirms "Delete"
         let deleteZone = document.querySelector('#checkboxBlock');
         if (e.target.value == "false"){
+
             //Show checkboxes 
             for(let i = 0; i < player.playlist.length; i++){
                 let checkBox = document.createElement('input');
@@ -132,9 +137,14 @@ window.onload = function(){
                 // dropZone.appendChild(checkBox);
                 deleteZone.appendChild(checkBox);
             }
+
+            // Add class and change button text
             e.target.classList.add('btnPressed');
             e.target.innerHTML = "Confirm DELETE"
+
         }else {
+
+            // Select all checkboxes
             let checkArr = document.querySelectorAll('#checkboxBlock input');
             
             //Delete "checked" tracks
@@ -147,7 +157,7 @@ window.onload = function(){
             showPlaylist(player.playlist, dropZone);
            
             // Switch "deleted" track
-            // Select next selected track or 'sample' if playlist empty
+            // Select next selected track or 'sample' if playlist is empty
             if(document.querySelector('.selected') != null){
                 if(curSong.file != document.querySelector('.selected').value){
                 stopCycle();
@@ -162,6 +172,7 @@ window.onload = function(){
                 buffering();
             }
 
+            // Delete class and change button text back
             e.target.classList.remove('btnPressed');
             e.target.innerHTML = "Delete";
         };
@@ -175,43 +186,55 @@ window.onload = function(){
 
     //ShowPlaylist Button
     document.querySelector('#btnShowPlaylist').addEventListener('click', (e)=>{
+
+        // Prevent default behaviour
         e.stopPropagation();
 
+        // Switch button and change visibility of the playlist
         toggleBtn(e.target, document.querySelector('#playlistWrapper'), 'showPL');
         
     });
 
     //ShowVisuals Button
     document.querySelector('#btnShowVisuals').addEventListener('click', (e)=>{
+
+        // Prevent default behaviour
         e.stopPropagation();
 
+        // Switch button and change visibility of the visualisator
         toggleBtn(e.target, document.querySelector('#visual'), 'showVIS');
         
     });
 
-
-    //BUTTONS------------------------------------------------------------
     //Play button
     document.querySelector('#btnPlay').addEventListener('click', (e)=>{
+
         //Works only if player is not in buffering state
         if(!bufferingState){
+
             //Reset the cycle break(If player auto-stop in the end -> allow to play the last song again)
             player.cycleEnd = false;
+
             //Launch autoplay
             if (!curSong.isPlaying()){
                 playCycle();
             }
+
         }
     });
 
     //Pause button
     document.querySelector('#btnPause').addEventListener('click', (e)=>{
+
         //Works only if player is not in buffering state
         if(!bufferingState){
+
             //Stop next callback event(next track playback)
             curSong.onended(()=>{});
-            //Stop timetracker
+
+            //Stop timeline tracker
             timeline.stopTimeline(false);
+
             //Pause current track
             curSong.pause();
         }
@@ -219,10 +242,13 @@ window.onload = function(){
 
     //Stop button
     document.querySelector('#btnStop').addEventListener('click', (e)=>{
+
         //Works only if player is not in buffering state
         if(!bufferingState){
+
             //Stop next callback event(next track playback)
             curSong.onended(()=>{});
+
             //Stop current track
             stopCycle();
         }
@@ -230,74 +256,104 @@ window.onload = function(){
     
     //Previous track button
     document.querySelector('#btnPrevious').addEventListener('click', (e)=>{
-        //Works only if player is not in buffering state
+
+        //Works only if player is not in the buffering state
         if(!bufferingState){
+
+            // Load previous(depending on settings) song
             newTrack(prevSong(player));
         }
     });
 
     //Next track button
     document.querySelector('#btnNext').addEventListener('click', (e)=>{
-        //Works only if player is not in buffering state
+
+        //Works only if player is not in the buffering state
         if(!bufferingState){
+
+            // Load next(depending on settings) song
             newTrack(nextSong(player));
         }
     });
 
     //Repeat button
     document.querySelector('#btnRepeat').addEventListener('click', (e)=>{
+
+        // Switch loop mode for the song 
         curSong.setLoop(!player.repeatSong);
-        toggleBtn(e.target, undefined, 'repeatSong')
+
+        // Switch button to give visual clue
+        toggleBtn(e.target, undefined, 'repeatSong');
+
     });
 
     //Shuffle play
     document.querySelector('#btnShuffle').addEventListener('click', (e)=>{
-        toggleBtn(e.target, undefined, 'shufflePlay')
+
+        // Switch button to give visual clue
+        toggleBtn(e.target, undefined, 'shufflePlay');
+
     });
 
     //Loop playlist
     document.querySelector('#btnLoop').addEventListener('click', (e)=>{
+
+        // Switch button to give visual clue
         toggleBtn(e.target, undefined, 'loopPlaylist');
+
     });
 
     // Change volume on click
     document.querySelector('#rangeVolume').addEventListener('change', (e)=>{
+
+        // Set volume level for the player
         player.volume = e.target.value;
+
+        // Change volume of the song 
         curSong.setVolume(+player.volume);
+
     })
 
 }
 
+// Initialize draw in the visualisation window
 function draw(){
     background(bgColor);
 
-	//draw the selected visualisation
+	// Draw the selected visualisation
     vis.selectedVisual.draw();
     
-    //draw the controls on top.
+    // Draw the controls on top
     controls.draw();
 }
 
+// Initialize mouse controls
 function mouseClicked(){
     controls.mousePressed();
 }
 
+// Initialize keyboard controls
 function keyPressed(){
 	controls.keyPressed(keyCode);
 }
 
+// Function to allow user input for the songs
 function loadFiles(source, playlistArr){
     let fileList = source.files;
     
+    // Allow multiple files
     for (let i = 0; i < fileList.length; i++){
+
         //Add only media files
         if (fileList[i].type == 'audio/mpeg'){
-            playlistArr.push(fileList[i])
+            playlistArr.push(fileList[i]);
         }
     }
 }
 
+// Function that handles playlist component
 function showPlaylist(playlistArr, playlistDiv){
+
     //Clear playlist screen
     playlistDiv.innerHTML = '';
     document.querySelector('#checkboxBlock').innerHTML = '';
@@ -317,14 +373,18 @@ function showPlaylist(playlistArr, playlistDiv){
     
     //Select only if playlist is not empty
     if (playNode.length > 0){
+
         //If currently playing track is in the playlist select it  
         if(playlistArr.indexOf(curSong.file) != -1){
             playNode[playlistArr.indexOf(curSong.file)].classList.add('selected');
         }
+
         //Else select the first track in playlist and load it
         else{
+
             //Mark the 1st element
             playNode[0].classList.add('selected');
+
             //Load the 1st track
             curSong.onended(()=>{});
             stopCycle();
@@ -332,46 +392,63 @@ function showPlaylist(playlistArr, playlistDiv){
         }
     }
 
-    //Ability to switch active track
+    //Ability to switch active track by click on the name in the playlist
     for (let i = 0; i < playNode.length; i++){
         playNode[i].addEventListener('click', (e)=>{
+
             //Select new track on click
             newTrack(e.target);
+
             //Reset the cycle break
             player.cycleEnd = false;
         })
     }
 }
 
+// Function to load new song (previous or next)
 function newTrack(trackLine){
+    
     //Stop callback loop from ocuring
     curSong.onended(()=>{});
+
+    // Current track
     let selected = document.querySelector('.selected');
-    //Clear prev track selection and add new
+
+    //Clear prev track selection and add new if there are songs in playlist
     if(selected != null){
         selected.classList.remove('selected');
         trackLine.classList.add('selected');
         
-        //Switch active song
+        // Load new selected song and start playing
         if (curSong.isPlaying() || curSong.isPaused()){
             stopCycle();
             curSong = loadSound(trackLine.value, 
                                     ()=>{timeline.newTimeline(curSong);
                     playCycle();});
+
+            // Show metadata
             buffering();
+
             //Keep player settings
             loadPlayerSettings(player);
-        }else curSong = loadSound(trackLine.value, 
+
+        }
+        // Load new selected song 
+        else curSong = loadSound(trackLine.value, 
                                     ()=>{timeline.newTimeline(curSong)});
-                buffering();
+
+            // Show metadata
+            buffering();
 
     }
 }
 
 //Function to load player settings for the current track
 function loadPlayerSettings(playerObj){
+
     //Keep loop
     if (playerObj.repeatSong) curSong.setLoop(playerObj.repeatSong);
+
     //Keep volume
     let v = +playerObj.volume;
     curSong.setVolume(v); 
@@ -379,12 +456,16 @@ function loadPlayerSettings(playerObj){
 
 //Function to play the track (with autoplay) and update its timeline
 function playCycle(){
+
     //If break not reached -> play and shedule next song
     if(!player.cycleEnd){
+
         //Start playing
         curSong.play();
+
         //Start updating timeline
         timeline.updateTimeline();
+
         //Update queque
         curSong.onended(()=>{
             newTrack(nextSong(player))});
@@ -415,6 +496,7 @@ function nextSong(playerObj){
     let curInd = indexCurrent(playerObj);
 
     if (playerObj.playlist.length > 0){
+
         //Random song if shuffleON
         if(playerObj.shufflePlay){
             if(player.playlist.length != 1){
@@ -428,6 +510,7 @@ function nextSong(playerObj){
             }else return dropZone[0];
         }
         else{
+
             //Return to 1st track when finished
             if(!playerObj.loopPlaylist){
                 if(curInd+1 < dropZone.length) return dropZone[curInd+1];
@@ -472,11 +555,14 @@ function prevSong(playerObj){
 function massClassChange(nodeArr, addOrRemove = 'add', className){
     let arr = nodeArr;
     let clName = className;
+
+    // If 'add' argument passed -> add class names
     if(addOrRemove == 'add'){
         for (let i = 0; i < arr.length; i++){
             arr[i].classList.add(clName);
         }
     }
+    // If 'remove' argument passed -> remove class names
     else if(addOrRemove == 'remove'){
         for (let i = 0; i < arr.length; i++){
             arr[i].classList.remove(clName);
@@ -484,7 +570,7 @@ function massClassChange(nodeArr, addOrRemove = 'add', className){
     }
 }
 
-//Function to display meta data on display
+//Function to display meta data on small screen
 function buffering(){
     let data1 = display.firstElementChild;
     let data2 = display.lastElementChild;
@@ -508,8 +594,10 @@ function buffering(){
 
     //Custom callback to check loading
     let bufferingCheck = setInterval(()=>{
+
         // If buffering is complete
         if(curSong.isLoaded()){
+
             //Display meta data
             data1.innerHTML = `Current Song: ${timeline.split(songName,'name')}</br>
                                             File Format: ${timeline.split(songName,'format')}`;
@@ -522,8 +610,10 @@ function buffering(){
             //Self terminate
             clearInterval(bufferingCheck);
         }
+
         // If still buffering
         else{
+
             //Show loading process dots
             if(data2.innerHTML.length == 5) data2.innerHTML = '.'
             else data2.innerHTML += '.'
@@ -534,6 +624,7 @@ function buffering(){
 
 //Function to switch button and visibility of the element
 function toggleBtn(btn, element, stateVar){
+
     // Get inner text and clear it of state
     let txt = btn.innerHTML.substring(0, btn.innerHTML.indexOf(':'));
 
@@ -551,6 +642,7 @@ function toggleBtn(btn, element, stateVar){
         btn.classList.remove('btnPressed');
         if(vis == 1)element.parentElement.style.display = 'none'
     }
+    
     // Toggle state
     player[stateVar] = !player[stateVar];
 }

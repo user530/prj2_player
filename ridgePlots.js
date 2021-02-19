@@ -1,3 +1,4 @@
+// Create waveform lines that create ridge plot
 function RidgePlots(){
 
     let ridges = [];

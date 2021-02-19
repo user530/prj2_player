@@ -1,4 +1,4 @@
-// 
+// Create needle plots for different energy levels
 function Needles() {
 	//Name of the visualisation
 	this.name = "Needles";
