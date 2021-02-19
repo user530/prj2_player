@@ -38,7 +38,8 @@ let btns = document.getElementsByClassName('ctrlBtn');
 // Load song
 function preload(){
     curSong = loadSound(sampleSound, 
-        ()=>{timeline.newTimeline(curSong)});
+        ()=>{timeline.newTimeline(curSong)}, 
+        ()=>{alert('Unsupported file format!')});
         buffering();
 }
 
@@ -51,7 +52,7 @@ function setup(){
     //Setup canvas
     let visualContainer = document.querySelector('#visual');
     let dimens = visualContainer.getBoundingClientRect();
-    let a = createCanvas (dimens.width, dimens.width * 3/4);
+    let a = createCanvas (dimens.width, dimens.width * 0.8 * 3/4);
     a.parent(visualContainer);
 
     //Initialize controlas and sound data
@@ -162,13 +163,15 @@ window.onload = function(){
                 if(curSong.file != document.querySelector('.selected').value){
                 stopCycle();
                 curSong = loadSound(document.querySelector('.selected').value, 
-                                    ()=>{timeline.newTimeline(curSong)});
+                                    ()=>{timeline.newTimeline(curSong)},
+                                    ()=>{alert('Unsupported file format!')});
                 buffering();
                 }
             }else{
                 stopCycle();
                 curSong = loadSound(sampleSound, 
-                                    ()=>{timeline.newTimeline(curSong)});
+                                    ()=>{timeline.newTimeline(curSong)},
+                                    ()=>{alert('Unsupported file format!')});
                 buffering();
             }
 
@@ -345,7 +348,7 @@ function loadFiles(source, playlistArr){
     for (let i = 0; i < fileList.length; i++){
 
         //Add only media files
-        if (fileList[i].type == 'audio/mpeg'){
+        if (fileList[i].type.includes('audio')){
             playlistArr.push(fileList[i]);
         }
     }
@@ -424,18 +427,17 @@ function newTrack(trackLine){
             stopCycle();
             curSong = loadSound(trackLine.value, 
                                     ()=>{timeline.newTimeline(curSong);
-                    playCycle();});
+                    playCycle();},
+                    ()=>{alert('Unsupported file format!')});
 
             // Show metadata
             buffering();
 
-            //Keep player settings
-            loadPlayerSettings(player);
-
         }
         // Load new selected song 
         else curSong = loadSound(trackLine.value, 
-                                    ()=>{timeline.newTimeline(curSong)});
+                                    ()=>{timeline.newTimeline(curSong)},
+                                    ()=>{alert('Unsupported file format!')});
 
             // Show metadata
             buffering();
@@ -454,19 +456,22 @@ function loadPlayerSettings(playerObj){
     curSong.setVolume(v); 
 }
 
-//Function to play the track (with autoplay) and update its timeline
+// Function to play the track (with autoplay) and update its timeline
 function playCycle(){
 
-    //If break not reached -> play and shedule next song
+    // If break not reached -> play and shedule next song
     if(!player.cycleEnd){
 
-        //Start playing
+        // Start playing
         curSong.play();
 
-        //Start updating timeline
+        //Keep player settings
+        loadPlayerSettings(player);
+
+        // Start updating timeline
         timeline.updateTimeline();
 
-        //Update queque
+        // Update queque
         curSong.onended(()=>{
             newTrack(nextSong(player))});
     }
