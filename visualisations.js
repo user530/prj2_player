@@ -1,7 +1,8 @@
-//container function for the visualisations
+//Container function for the visualisations
 function Visualisations(){
 	//array to store visualisations
 	this.visuals = [];
+	
 	//currently selected vis. set to null until vis loaded in
 	this.selectedVisual = null;
 

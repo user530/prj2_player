@@ -1,23 +1,23 @@
 //Constructor function to handle the onscreen menu, keyboard and mouse
 //controls
 function ControlsAndInput(){
-	
+
 	//Show control info for the first time
 	let info = 1;
 
+	// Menu visibility state
 	this.menuDisplayed = false;
 	
-	//Fullscreen mode button displayed in the bottom right of the screen
+	//Fullscreen (not real fullscreen) mode button displayed in the bottom right of the screen
 	this.fullscreenButton = new FullscreenButton();
 
-	//make the window fullscreen or revert to windowed
+	//Make the window fullscreen or revert to windowed
 	this.mousePressed = function(){
 
-		//check if the fullscreen mode button has been clicked
+		//Check if the fullscreen mode button has been clicked
 		if(this.fullscreenButton.hitCheck())
 		{
 			this.fullscreenButton.resize()
-			
 		}
 		
 	};
@@ -31,43 +31,48 @@ function ControlsAndInput(){
 			//Disable info
 			info = 0;
 		}
-
-		if(keycode > 48 && keycode < 58){
+		//Select appropriate visualisation
+		if(keycode > 48 && keycode < 56){
 			var visNumber = keycode - 49;
 			vis.selectVisual(vis.visuals[visNumber].name); 
 		}
 	};
 
-	//draws the playback button and potentially the menu
+	//Draws the playback button and potentially the menu
 	this.draw = function(){
 		push();
 		fill("white");
 		stroke("black");
 		strokeWeight(2);
-		textSize(34);
+
+		// Get canvas element width for adjustable text size;
+		let canWid = canvas.style.width.substring(0,canvas.style.width.indexOf('p'));
+
+		// Adjustable text size
+		textSize(canWid*0.035);
 
 		//Fullscreen button
 		this.fullscreenButton.draw();
 
-		//only draw the menu if menu displayed is set to true.
+		//Only draw the menu if menu displayed is set to true.
 		if(this.menuDisplayed){
-			text("Select a visualisation:", 80, 30);
-			this.menu();
+			text("Select a visualisation:", width * 0.1, height * 0.05);
+			this.menu(canWid);
 		}
 
-		//show control button at the start
-		if (info == 1) text("Press the 'Space' button to open the visualisation menu", 80, 30);
+		//Show control button at the start
+		if (info == 1) text("Press the 'Space' button to open the visualisation menu", width * 0.1, height * 0.05);
 		pop();
 
 	};
 
-	this.menu = function(){
-		//draw out menu items for each visualisation
+	// Draw available visualisations
+	this.menu = function(w){
+		//Draw out menu items for each visualisation
 		for (let i = 0; i < vis.visuals.length; i++)
 		{
-			text((i + 1) + ". " + vis.visuals[i].name, 100, 70 + i * 40);
+			text((i + 1) + ". " + vis.visuals[i].name, 100, w * (0.075 + i * 0.038));
 		}
-
 	};
 }
 

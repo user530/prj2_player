@@ -1,3 +1,4 @@
+// Draw columns for the different values of the sound spectrum
 function Spectrum(){
 	this.name = "Spectrum";
 	

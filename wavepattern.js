@@ -1,3 +1,4 @@
+// Draw wave pattern of the selected song
 function WavePattern(){
 	
 	this.name = "Wave pattern";

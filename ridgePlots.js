@@ -13,8 +13,8 @@ function RidgePlots(){
         let plotWidth = width * 3/5;
         let plotHeight = height * 3/5;
         let verStep = 0.5;
-        let bigScale = 80;
-        let smolScale = 20;
+        let bigScale = 60;
+        let smolScale = 8;
         
         //Setup initial position
         let startX = width/5;

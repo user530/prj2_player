@@ -1,13 +1,17 @@
-//Idea for this algorithm is inspired by 
+//Idea for the 2.5D calculation for this algorithm is inspired by 
 //https://www.lexaloffle.com/bbs/?tid=35767
+// Draw and move in pseudo 3D snapshots of the spectrum
 function Vis3(){
-    this.name = 'TestVis3';
+    this.name = 'New Visual 3';
     
     let rows = [];
 
     let col = 255;
 
+    // Draw the pseudo 3D snapshots
     this.draw = function(){
+
+        // Get required sound data
         let spectrum = fourier.analyze();
         let bass = fourier.getEnergy("bass");
         
@@ -102,6 +106,7 @@ function Vis3(){
         }
     }
 
+    // Function to create movement cycle
     let movementCycle = function(snapInd, dist){
         //Move each snapshot 
         rows[snapInd].z += 0.01;

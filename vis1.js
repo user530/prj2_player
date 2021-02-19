@@ -1,14 +1,19 @@
+// Wrap the spectrum around circle, turn it when bass value is high, and shoot the stars on beat
 function Vis1(){
-    this.name = 'TestVis1';
+    this.name = 'New Visual 1';
     let angle = 0;
     let r = 80;
     let stars = [];
     let starCount = 200;
 
+    // Draw this visualisation
     this.draw = function(){
+
+        // Get required sound data
         let spectrum = fourier.analyze();
         let bass = fourier.getEnergy("bass");
 
+        // Setup drawing styles
         push();
         angleMode(DEGREES);
         fill(255,0,0);
@@ -20,65 +25,37 @@ function Vis1(){
             //Increase the r of the circle
             r = 120;
 
-            //Setup N random angles for the stars, add new when needed
-            if (stars.length < starCount){
-                for(let i = stars.length; i < starCount; i++){
-                    //Initialize a star
-                    let star = {};
-                    //Set random angle and speed
-                    let randAng = Math.ceil(map(Math.random(), 0, 1, 0, 720)) * 360/720;
-                    let randSpd = Math.ceil(map(Math.random(), 0, 1, 1, 10));
-                    //Set attributes and save the star
-                    star.ang = randAng;
-                    star.spd = randSpd;
-                    stars.push(star);
-                }
-            }
+            //Add stars on beat
+            addStars(stars, starCount)
+        
         } 
 
         let points = [];
+
         //Draw a circle that changes on beat
         beginShape(POINTS);
         for(let i = 0; i < 720; i++){
+            //Calculate angle and coordinates
             let ang = (angle + (i*360/720))%360;
             let x = width/2 + (r * cos(ang));
             let y = height/2 + (r * sin(ang));
 
+            //Update coordinates
             points.push([x,y]);
 
+            //Draw point
             vertex(x, y);
 
             //Check the angle against the angles of the stars
-            for(let j = 0; j < stars.length; j++){
-                //and if there no coordinates already
-                if(ang == stars[j].ang && stars[j].x == undefined){
-                    //set the coordinates of this point to the star
-                    stars[j].x = x;
-                    stars[j].y = y; 
-                }
-            }
+            updateStars(stars, ang, x, y);
         }
         endShape();
 
         //Draw the line from each point lines that represent spectrum
-        for(let i = 0; i < points.length; i++){
-            line(points[i][0],points[i][1],
-                points[i][0] + (spectrum[i] * cos(angle + (i*360/points.length))),
-                points[i][1] + (spectrum[i] * sin(angle + (i*360/points.length))))          
-        }
+        drawLines(points, spectrum, angle);
 
         //Shoot the stars!
-        for(let i = 0; i < stars.length; i++){
-            //Draw the star
-            point(stars[i].x, stars[i].y);
-            //Move the star
-                stars[i].x = stars[i].x + stars[i].spd * cos(stars[i].ang);
-                stars[i].y = stars[i].y + stars[i].spd * sin(stars[i].ang);
-            //Delete it when it leaves the screen
-            if(stars[i].x < 0 || stars[i].x > width || stars[i].y < 0 || stars[i].y > height){
-                stars.splice(i,1);
-            }
-        }
+        shootStars(stars);
 
         //Rotate when bass energy is high
         if(bass>180) angle++
@@ -87,5 +64,59 @@ function Vis1(){
         if(r>80) r--
          
         pop();
+    }
+
+    //Function to generate new stars
+    let addStars = function(starArr, starCnt){
+        //Setup N random angles for the stars, add new when needed
+        if (starArr.length < starCnt){
+            for(let i = starArr.length; i < starCnt; i++){
+                //Initialize a star
+                let star = {};
+                //Set random angle and speed
+                let randAng = Math.ceil(map(Math.random(), 0, 1, 0, 720)) * 360/720;
+                let randSpd = Math.ceil(map(Math.random(), 0, 1, 1, 10));
+                //Set attributes and save the star
+                star.ang = randAng;
+                star.spd = randSpd;
+                starArr.push(star);
+            }
+        }
+    }
+
+    //Function to update star position based on its angle
+    let updateStars = function(starArr, angle, xPos, yPos){
+        for(let j = 0; j < starArr.length; j++){
+            //and if there no coordinates already
+            if(angle == starArr[j].ang && starArr[j].x == undefined){
+                //set the coordinates of this point to the star
+                starArr[j].x = xPos;
+                starArr[j].y = yPos; 
+            }
+        }
+    }
+
+    //Function to draw lines based on the spectrum value
+    let drawLines = function(pointsArr, spectrum, angle){
+        for(let i = 0; i < pointsArr.length; i++){
+            line(pointsArr[i][0],pointsArr[i][1],
+                pointsArr[i][0] + (spectrum[i] * cos(angle + (i*360/pointsArr.length))),
+                pointsArr[i][1] + (spectrum[i] * sin(angle + (i*360/pointsArr.length))))          
+        }
+    }
+
+    //Function to draw and update stars
+    let shootStars = function(starsArr){
+        for(let i = 0; i < starsArr.length; i++){
+            //Draw the star
+            point(starsArr[i].x, starsArr[i].y);
+            //Move the star
+            starsArr[i].x = starsArr[i].x + starsArr[i].spd * cos(starsArr[i].ang);
+            starsArr[i].y = starsArr[i].y + starsArr[i].spd * sin(starsArr[i].ang);
+            //Delete it when it leaves the screen
+            if(starsArr[i].x < 0 || starsArr[i].x > width || starsArr[i].y < 0 || starsArr[i].y > height){
+                starsArr.splice(i,1);
+            }
+        }
     }
 }

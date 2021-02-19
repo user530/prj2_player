@@ -1,12 +1,17 @@
+// Please be carefull, alot of bright flashes!
+// Create 5 energy nodes that spawn colorfull balls that bounce along the screen borders and explode on collision causing background flash 
 function Vis2(){
     angleMode(DEGREES);
 
-    this.name = 'TestVis2';
+    this.name = 'New Visual 2 (! SEIZURE WARNING!)';
 
     let balls = [];
     let bgColor = 0;
 
+    // Draw this visualisation
     this.draw = function(){
+
+        // Get required sound data
         let spectrum = fourier.analyze();
         let bass = fourier.getEnergy("bass");
         let lowMid = fourier.getEnergy("lowMid");
@@ -15,18 +20,23 @@ function Vis2(){
         let treble = fourier.getEnergy("treble");
         let beatThisFrame = beatdetector.detectBeat(spectrum);
 
+        // Setup drawing styles
         background(bgColor);
         stroke(255);
 
+        // Create energy nodes
         createNodes(bass, lowMid, mid, highMid, treble, beatThisFrame);
         
+        // Draw balls
         drawBalls();
     }
 
     //Function to create nodes that spawn balls
     let createNodes = function(bass, lowMid, mid, highMid, treble, beat){
+
         //Draw the energy nodes for the song
         for(let i = 0; i < 5; i++){
+
             //Setup the nodes that they will make the pattern;
             let x = (i%3 == 0) * width/4 + (i%3 == 1) * width * 3/4 + (i%3 == 2) * width/2;
             let y = (i < 2) * height/4 + (i > 2) * height * 3/4 + (i == 2) * height/2;
@@ -49,9 +59,12 @@ function Vis2(){
 
             // Spawn the balls(from 1 to 5) on beat;
             if(beat){
+
                 //Setup n of iterations
                 let iter = Math.ceil(rightEnergy/51);
+
                 for(let j = 0; j < iter; j++){
+
                     //Initialize and setup each ball
                     let ball = {};
 
@@ -71,8 +84,10 @@ function Vis2(){
 
     //Function to draw balls
     let drawBalls = function(){
+
         //Iterate over all balls
         for(let i = 0; i < balls.length; i++){
+
             //Draw ball
             push();
             stroke(255);
@@ -82,21 +97,26 @@ function Vis2(){
 
             //Update balls x coordinate
             let vectX = balls[i].speed * cos(balls[i].ang)
+
                 //Check if ball moves to the right
             if(cos(balls[i].ang) > 0){
+                
                 //Move ball to the right but within bounds
                 balls[i].x1 += min(vectX, width - (balls[i].x1 + balls[i].d/2));
             }
             //Check if ball moves to the left
             else{
+
                 //Move ball to the left but within bounds
                 balls[i].x1 += max(vectX, -balls[i].x1 + balls[i].d/2);
             }
 
             //Update balls y coordinate
             let vectY = balls[i].speed * sin(balls[i].ang);
+
                 //Check if ball moves to the top
             if(sin(balls[i].ang) < 0){
+
                 //Move ball to the top but within bounds
                 balls[i].y1 += max(vectY, -balls[i].y1 + balls[i].d/2);
             }
@@ -124,11 +144,14 @@ function Vis2(){
 
             // For each ball check the collision
             for(let j = i + 1; j < balls.length; j++){
+
                 //Check balls collision
                 if(dist(balls[i].x1, balls[i].y1, 
                     balls[j].x1, balls[j].y1) <= (balls[i].d + balls[j].d)/2){
+
                         // Background flash on collision
                         bgColor = balls[i].color;
+
                         // Erase collided balls
                         balls.splice(i, 1);
                         balls.splice(j - 1, 1);

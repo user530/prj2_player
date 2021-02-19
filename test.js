@@ -1,47 +1,62 @@
+// Main js file that handles player, playlist and visualisation
 let player = {playlist: [],
                 volume: 1,
+                showPL: true,
+                showVIS: true,
                 repeatSong: false,
                 loopPlaylist: false,
                 shufflePlay: false,
                 cycleEnd: false};
 let curSong;
+
+// Sample sound for testing
 let sampleSound = 'jump.wav';
+
+// Loading state
 let bufferingState = false;
 
+// Initialize timeline component
 let timeline = new Timeline('timeline');
+
+// Initialize beat detection
 let beatdetector = new BeatDetector();
+
+// Setup other variables that we use
 let controls;
 let vis;
 let fourier;
-
 let dropZone;
 let display = document.querySelector('#display');
 let btns = document.getElementsByClassName('ctrlBtn');
 
 let bgColor = 0;
 
-
+// Load song
 function preload(){
     curSong = loadSound(sampleSound, 
         ()=>{timeline.newTimeline(curSong)});
         buffering();
 }
 
+// Load all components and setup canvas
 function setup(){
     
     frameRate(60);
 
-    //-----------------------------------------------------
+    //Setup canvas
     let visualContainer = document.querySelector('#visual');
-    let a = createCanvas (1000, 500);
+    let dimens = visualContainer.getBoundingClientRect();
+    let a = createCanvas (dimens.width, dimens.width * 3/4);
     a.parent(visualContainer);
-    //-----------------------------------------------------
 
+    //Initialize controlas and sound data
     controls = new ControlsAndInput();
-
     fourier = new p5.FFT();
 
+    //Setup visualisation container
     vis = new Visualisations();
+
+    //Add visualisations to the container
     vis.add(new Spectrum());
     vis.add(new WavePattern());
     vis.add(new Needles());
@@ -52,8 +67,19 @@ function setup(){
 
 }
 
+// // Change canvas size on resize
+// window.addEventListener('resize', ()=>{
+//     let visDiv = document.querySelector('#visual');
+//     let wrap = visDiv.getBoundingClientRect();
+//     resizeCanvas(wrap.width, wrap.height);
+//     // canvas.style.width = '100%';
+//     // canvas.style.height = '100%';
+// })
+
+// Initialize only when page fully loaded
 window.onload = function(){
-    //---PLAYLIST---
+    
+    //Define playlist zone that will be used
     dropZone = document.querySelector('#dropField');
     
     //AddSongBtn
@@ -69,13 +95,14 @@ window.onload = function(){
     });
     
     //Custom drag'N'drop field
+        //Copy dragged files
     dropZone.addEventListener('dragover', (e) => {
         e.stopPropagation();
         e.preventDefault();
 
         e.dataTransfer.dropEffect = 'copy';
     });
-
+        //Load copied songs 
     dropZone.addEventListener('drop', (e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -146,18 +173,11 @@ window.onload = function(){
 
     });
 
-    //Function to switch visibility of the element
-    function toggleVisibility(element){
-        let dispStyle = window.getComputedStyle(element).display;
-        if(dispStyle != 'none') element.style.display = 'none'
-        else element.style.display = 'block'
-    }
-
     //ShowPlaylist Button
     document.querySelector('#btnShowPlaylist').addEventListener('click', (e)=>{
         e.stopPropagation();
 
-        toggleVisibility(document.querySelector('#playlistWrapper'));
+        toggleBtn(e.target, document.querySelector('#playlistWrapper'), 'showPL');
         
     });
 
@@ -165,7 +185,7 @@ window.onload = function(){
     document.querySelector('#btnShowVisuals').addEventListener('click', (e)=>{
         e.stopPropagation();
 
-        toggleVisibility(document.querySelector('#visual'));
+        toggleBtn(e.target, document.querySelector('#visual'), 'showVIS');
         
     });
 
@@ -227,43 +247,20 @@ window.onload = function(){
     //Repeat button
     document.querySelector('#btnRepeat').addEventListener('click', (e)=>{
         curSong.setLoop(!player.repeatSong);
-        if (!player.repeatSong){
-            e.target.innerHTML = "REPEAT MODE: ON";
-            e.target.classList.add('btnPressed');
-            player.repeatSong = !player.repeatSong;
-        } else {
-            e.target.innerHTML = "REPEAT MODE: OFF";
-            e.target.classList.remove('btnPressed');
-            player.repeatSong = !player.repeatSong;
-        }
+        toggleBtn(e.target, undefined, 'repeatSong')
     });
 
     //Shuffle play
     document.querySelector('#btnShuffle').addEventListener('click', (e)=>{
-        if (!player.shufflePlay){
-            e.target.innerHTML = "SHUFFLE: ON";
-            e.target.classList.add('btnPressed');
-            player.shufflePlay = !player.shufflePlay;
-        } else {
-            e.target.innerHTML = "SHUFFLE: OFF";
-            e.target.classList.remove('btnPressed');
-            player.shufflePlay = !player.shufflePlay;
-        }
+        toggleBtn(e.target, undefined, 'shufflePlay')
     });
 
     //Loop playlist
     document.querySelector('#btnLoop').addEventListener('click', (e)=>{
-        if (!player.loopPlaylist){
-            e.target.innerHTML = "LOOP PLAYLIST: ON";
-            e.target.classList.add('btnPressed');
-            player.loopPlaylist = !player.loopPlaylist;
-        } else {
-            e.target.innerHTML = "LOOP PLAYLIST: OFF";
-            e.target.classList.remove('btnPressed');
-            player.loopPlaylist = !player.loopPlaylist;
-        }
+        toggleBtn(e.target, undefined, 'loopPlaylist');
     });
 
+    // Change volume on click
     document.querySelector('#rangeVolume').addEventListener('change', (e)=>{
         player.volume = e.target.value;
         curSong.setVolume(+player.volume);
@@ -534,3 +531,26 @@ function buffering(){
     }, 200);
 
 } 
+
+//Function to switch button and visibility of the element
+function toggleBtn(btn, element, stateVar){
+    // Get inner text and clear it of state
+    let txt = btn.innerHTML.substring(0, btn.innerHTML.indexOf(':'));
+
+    // Check if this function should switch wrapper visibility
+    let vis = 0;
+    if(element != undefined) vis = 1;
+
+    // Change state, text and class depending on the state and arguments
+    if(!player[stateVar]){
+        btn.innerHTML = txt + ': ON';
+        btn.classList.add('btnPressed');
+        if(vis == 1)element.parentElement.style.display = 'flex'
+    }else{
+        btn.innerHTML = txt + ': OFF';
+        btn.classList.remove('btnPressed');
+        if(vis == 1)element.parentElement.style.display = 'none'
+    }
+    // Toggle state
+    player[stateVar] = !player[stateVar];
+}
