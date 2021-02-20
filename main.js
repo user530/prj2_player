@@ -48,7 +48,7 @@ function setup(){
     
     // Setup default framerate
     frameRate(60);
-
+ 
     //Setup canvas
     let visualContainer = document.querySelector('#visual');
     let dimens = visualContainer.getBoundingClientRect();
@@ -504,15 +504,24 @@ function nextSong(playerObj){
 
         //Random song if shuffleON
         if(playerObj.shufflePlay){
+
+            // Reset play cycle if needed
+            if(player.cycleEnd) player.cycleEnd = false;
+
+            // Return random is more than one song
             if(player.playlist.length != 1){
                 let a = indexRandom(playerObj);
                 
+                // Random until index is equal to the current
                 while (a == curInd){
                     a = indexRandom(playerObj)
                 }
 
+                // Return new random song
                 return dropZone[a];
-            }else return dropZone[0];
+            }
+            // Return the only song in playlist
+            else return dropZone[0];
         }
         else{
 
@@ -523,7 +532,14 @@ function nextSong(playerObj){
                     player.cycleEnd = true;
                     return dropZone[curInd];
                 };
-            }else return dropZone[(curInd+1)%dropZone.length];
+            }
+            // Loop playlist
+            else {
+                
+                // Reset play cycle if needed and select 1st song
+                if(player.cycleEnd) player.cycleEnd = false; 
+                return dropZone[(curInd+1)%dropZone.length];
+            }
         }  
     }  
 };
