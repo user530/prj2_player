@@ -30,6 +30,7 @@ function Vis3(){
             
             //Draw snapshots
             for (let i = 0; i < rows.length; i++){
+                
                 //Make each snap individual
                 push();
 
@@ -65,9 +66,9 @@ function Vis3(){
 
     //Function to generate bright random color 
     let randCol = function(energy){
-        return col = [map(Math.random()*energy, 0, 255, 100, 255),
-            map(Math.random()*energy, 0, 255, 100, 255),
-            map(Math.random()*energy, 0, 255, 100, 255)]
+        return col = [map(Math.random()*energy, 0, 255, 150, 255),
+            map(Math.random()*energy, 0, 255, 150, 255),
+            map(Math.random()*energy, 0, 255, 150, 255)]
     }
 
     //Function to create a 2D projection from 3D coordinates
@@ -82,10 +83,12 @@ function Vis3(){
 
     //Function to draw spectrum lines
     let buildSnapshot = function(snapInd, horWid, lineNumber){
+
         //Out of bounds check
         if(lineNumber >= 1024)console.log('Argument should be between 0 and 1024');
         else{
             for(let j = 0; j < lineNumber; j++){
+
             /*Map spectrum (odd energy val - to the bottom, even - to the top),
              height of each line is pseudo-random, max height is "4" */
             let lineHeight = noise(snapInd * j) * 4;
@@ -108,6 +111,7 @@ function Vis3(){
 
     // Function to create movement cycle
     let movementCycle = function(snapInd, dist){
+
         //Move each snapshot 
         rows[snapInd].z += 0.01;
 

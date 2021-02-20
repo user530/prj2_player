@@ -67,6 +67,8 @@ function setup(){
     vis.add(new WavePattern());
     vis.add(new Needles());
     vis.add(new RidgePlots());
+    vis.add(new Snakeline());
+    vis.add(new Fireworks());
     vis.add(new Vis1());
     vis.add(new Vis2());
     vis.add(new Vis3());

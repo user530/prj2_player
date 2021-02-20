@@ -3,7 +3,7 @@
 function Vis2(){
     angleMode(DEGREES);
 
-    this.name = 'New Visual 2 (! SEIZURE WARNING!)';
+    this.name = 'New Visual 2 (!SEIZURE WARNING!)';
 
     let balls = [];
     let bgColor = 0;

@@ -32,7 +32,7 @@ function ControlsAndInput(){
 			info = 0;
 		}
 		//Select appropriate visualisation
-		if(keycode > 48 && keycode < 56){
+		if(keycode > 48 && keycode < 58){
 			var visNumber = keycode - 49;
 			vis.selectVisual(vis.visuals[visNumber].name); 
 		}
