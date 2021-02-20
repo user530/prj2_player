@@ -14,8 +14,8 @@ function FullscreenButton(){
         //Coordinates of the button
         iconX = 20;
         iconY = 20;
-        iconW = 15;
-        iconH = 15;
+        iconW = 20;
+        iconH = 20;
 
         //Draw this button
         push();
