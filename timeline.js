@@ -34,6 +34,9 @@ function Timeline(lineID){
             //Jump to the click timestamp
             curSong.jump(stamp);
 
+            //Load settings, so if a user starts playing using timeline settings load properly 
+            loadPlayerSettings(player);
+
             //Restore callback
             curSong.onended(()=>{
                 newTrack(nextSong(player))});

@@ -1,6 +1,10 @@
 /*
 	By Osvaldas Valutis, www.osvaldas.info
 	Available for use under the MIT License
+
+	Custom input button:
+	1) https://osvaldas.info/smart-custom-file-input
+	2) http://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way
 */
 
 'use strict';
