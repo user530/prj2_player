@@ -238,6 +238,11 @@ canvas {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+#dropField div:hover {
+  text-decoration: underline;
 }
 
 #checkboxBlock {
